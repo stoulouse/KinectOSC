@@ -8,14 +8,14 @@
     <framework targetVersion="4.0" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="KinectOSC.exe.manifest" size="6463">
+    <dependentAssembly dependencyType="install" codebase="KinectOSC.exe.manifest" size="5267">
       <assemblyIdentity name="KinectOSC.exe" version="1.0.0.1" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>PqZlf1n9xzt9095rlWssdwTMvf4=</dsig:DigestValue>
+        <dsig:DigestValue>FIdiZx63Bjj8cYkUK1z37ECyJtE=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

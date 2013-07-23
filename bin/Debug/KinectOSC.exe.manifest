@@ -47,38 +47,38 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Bespoke.Common.dll" size="107520">
-      <assemblyIdentity name="Bespoke.Common" version="4.3.0.0" publicKeyToken="843A094264521388" language="neutral" processorArchitecture="x86" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>jwGgH6ibBRqE4wp5ORGyE1rygrY=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Bespoke.Common.Osc.dll" size="19456">
-      <assemblyIdentity name="Bespoke.Common.Osc" version="4.3.0.0" publicKeyToken="843A094264521388" language="neutral" processorArchitecture="x86" />
-      <hash>
-        <dsig:Transforms>
-          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-        </dsig:Transforms>
-        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>xN9rof7InRcpMfS6Eade2jG7GBQ=</dsig:DigestValue>
-      </hash>
-    </dependentAssembly>
-  </dependency>
-  <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="KinectOSC.exe" size="124416">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="KinectOSC.exe" size="121344">
       <assemblyIdentity name="KinectOSC" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>KITkaPT6qN0gXbNf+eXhH84w7ms=</dsig:DigestValue>
+        <dsig:DigestValue>s4+ol02/wpugKVpENoAOYm9ruq0=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MathNet.Numerics.dll" size="924672">
+      <assemblyIdentity name="MathNet.Numerics" version="2.5.0.27" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>d5PdGtmnIbK/GLHYieSier2IQoU=</dsig:DigestValue>
+      </hash>
+    </dependentAssembly>
+  </dependency>
+  <dependency>
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="MathNet.Numerics.IO.dll" size="38912">
+      <assemblyIdentity name="MathNet.Numerics.IO" version="2.5.0.27" language="neutral" processorArchitecture="msil" />
+      <hash>
+        <dsig:Transforms>
+          <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+        </dsig:Transforms>
+        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+        <dsig:DigestValue>gKN3zaP617eYFZZ7gIHMLXbM4II=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -94,31 +94,4 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="Bespoke.Common.dll" size="107520">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>jwGgH6ibBRqE4wp5ORGyE1rygrY=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Bespoke.Common.Osc.dll" size="19456">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>xN9rof7InRcpMfS6Eade2jG7GBQ=</dsig:DigestValue>
-    </hash>
-  </file>
-  <file name="Ventuz.OSC.dll" size="33792">
-    <hash>
-      <dsig:Transforms>
-        <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
-      </dsig:Transforms>
-      <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>9LhhG4ZC2Ld3PiDR9GJvzEa2a5o=</dsig:DigestValue>
-    </hash>
-  </file>
 </asmv1:assembly>
