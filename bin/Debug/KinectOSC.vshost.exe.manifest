@@ -47,14 +47,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="KinectOSC.exe" size="121344">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="KinectOSC.exe" size="122368">
       <assemblyIdentity name="KinectOSC" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>RfUDW+FNH+NwLxgAfjGscTv3lr0=</dsig:DigestValue>
+        <dsig:DigestValue>cEkSBhNjetopb5o60Hj2/ydEz6E=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

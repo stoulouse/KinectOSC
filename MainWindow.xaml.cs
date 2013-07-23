@@ -245,6 +245,30 @@ namespace KinectOSC
             #endregion
             
             /// <summary>
+            /// Create a new sensor with location and orientation parameters
+            /// </summary>
+            /// <param name="sensor">A given Kinect sensor</param>
+            /// <param name="x">X, in global coordinates</param>
+            /// <param name="y">Y, in global coordinates</param>
+            /// <param name="z">Z, in global coordinates</param>
+            /// <param name="theta">Rotation around the vertical axis, </param>
+            /// <param name="skeletonDrawingImage">Image that we'll draw the skeleton on</param>
+            /// <param name="colorImage">Image we'll use to push the color camera video to</param>
+
+            public VisualKinectUnit(KinectSensor sensor, float x, float y, float z,
+                // Was going 
+                //double rotationVectorX, double rotationVectorY, double rotationVectorZ,
+                                  double theta,
+                                  System.Windows.Controls.Image skeletonDrawingImage = null,
+                                  System.Windows.Controls.Image colorImage = null)
+            {
+                this.locatedSensor = new LocatedSensor(sensor,x,y,z,theta);
+                this.skeletonDrawingImage = skeletonDrawingImage;
+                this.colorImage = colorImage;
+                this.initialize();
+            }
+
+            /// <summary>
             /// Constructor for VisualKinectUnit
             /// </summary>
             /// <param name="sensor">LocatedSensor class kinect sensor</param>
@@ -256,36 +280,42 @@ namespace KinectOSC
                 this.locatedSensor = locatedSensor;
                 this.skeletonDrawingImage = skeletonDrawingImage;
                 this.colorImage = colorImage;
+                this.initialize();
+            }
 
+            public void Stop(){
+                if (this.locatedSensor != null){
+                    locatedSensor.sensor.Stop();
+                }
+            }
+
+            private void initialize()
+            {
                 // Set up the basics for drawing a skeleton
                 // Create the drawing group we'll use for drawing
                 this.drawingGroup = new DrawingGroup();
                 // Create an image source that we can use in our image control
                 this.imageSource = new DrawingImage(this.drawingGroup);
                 // Turn on the skeleton stream to receive skeleton frames
-                locatedSensor.sensor.SkeletonStream.Enable();
+                this.locatedSensor.sensor.SkeletonStream.Enable();
                 // Turn on the color stream to receive color frames
-                locatedSensor.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                this.locatedSensor.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
                 // This is the bitmap we'll display on-screen
-                colorBitmap = (new WriteableBitmap(locatedSensor.sensor.ColorStream.FrameWidth,
-                                                   locatedSensor.sensor.ColorStream.FrameHeight,
+                this.colorBitmap = (new WriteableBitmap(this.locatedSensor.sensor.ColorStream.FrameWidth,
+                                                   this.locatedSensor.sensor.ColorStream.FrameHeight,
                                                    96.0, 96.0, PixelFormats.Bgr32, null));
 
                 // Add an event handler to be called whenever there is new color frame data
-                if (colorImage != null) {
-                    locatedSensor.sensor.ColorFrameReady += this.refreshColorImage;
+                if (colorImage != null)
+                {
+                    this.locatedSensor.sensor.ColorFrameReady += this.refreshColorImage;
                 }
                 // Add an event handler to be called whenever there is new color frame data
-                if (skeletonDrawingImage != null) {
+                if (skeletonDrawingImage != null)
+                {
                     locatedSensor.sensor.SkeletonFrameReady += this.refreshSkeletonDrawing;
                     this.skeletonDrawingImage.Source = imageSource;
-                }
-            }
-
-            public void Stop(){
-                if (this.locatedSensor != null){
-                    locatedSensor.sensor.Stop();
                 }
             }
 
