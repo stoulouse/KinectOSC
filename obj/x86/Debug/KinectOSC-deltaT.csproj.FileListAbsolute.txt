@@ -25,5 +25,5 @@ C:\Users\Meteor\Dropbox\Laboratory\Art Projects\004-deltaT\KinectOSC-deltaT\bin\
 C:\Users\Meteor\Dropbox\Laboratory\Art Projects\004-deltaT\KinectOSC-deltaT\obj\x86\Debug\KinectOSC.exe.manifest
 C:\Users\Meteor\Dropbox\Laboratory\Art Projects\004-deltaT\KinectOSC-deltaT\obj\x86\Debug\KinectOSC.application
 C:\Users\Meteor\Dropbox\Laboratory\Art Projects\004-deltaT\KinectOSC-deltaT\obj\x86\Debug\KinectOSC.pdb
-C:\Users\Chatham\Dropbox\Laboratory\Art Projects\KinectOSC-deltaT\obj\x86\Debug\KinectOSC.exe
-C:\Users\Chatham\Dropbox\Laboratory\Art Projects\KinectOSC-deltaT\obj\x86\Debug\KinectOSC.pdb
+C:\Users\Meteor\Dropbox\Laboratory\Art Projects\008-PaperAquarium\KinectOSC-deltaT\obj\x86\Debug\KinectOSC.exe
+C:\Users\Meteor\Dropbox\Laboratory\Art Projects\008-PaperAquarium\KinectOSC-deltaT\obj\x86\Debug\KinectOSC.pdb

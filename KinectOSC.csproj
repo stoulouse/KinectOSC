@@ -68,6 +68,8 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bespoke.Common, Version=4.3.0.0, Culture=neutral, PublicKeyToken=843a094264521388, processorArchitecture=x86" />
+    <Reference Include="Bespoke.Common.Osc, Version=4.3.0.0, Culture=neutral, PublicKeyToken=843a094264521388, processorArchitecture=x86" />
     <Reference Include="MathNet.Numerics">
       <HintPath>packages\MathNet.Numerics.2.5.0\lib\net40\MathNet.Numerics.dll</HintPath>
     </Reference>
@@ -104,6 +106,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="VisualKinectUnit.cs" />
+    <Compile Include="LocatedSensor.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -128,6 +132,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="KinectOSC_TemporaryKey.pfx" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -144,6 +149,7 @@
     <Resource Include="Images\UncheckedNormal.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Ventuz.OSC.dll" />
     <Resource Include="Ventuz.OSC.xml" />
   </ItemGroup>
   <ItemGroup>
