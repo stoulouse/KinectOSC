@@ -139,10 +139,18 @@ namespace KinectOSC
                         // Good to go, so count this one as connected!
                         // So let's set up some environment for this...
                        
-                        LocatedSensor sensor = new LocatedSensor(potentialSensor, kinectXPositions[numberOfKinects],
-                                                                                  kinectYPositions[numberOfKinects],
-                                                                                  kinectZPositions[numberOfKinects],
-                                                                                  kinectAngles[numberOfKinects]);
+                      //  LocatedSensor sensor = new LocatedSensor(potentialSensor, kinectXPositions[numberOfKinects],
+                      //                                                            kinectYPositions[numberOfKinects],
+                       //                                                           kinectZPositions[numberOfKinects],
+                         //                                                         kinectAngles[numberOfKinects]);
+                        LocatedSensor sensor = new LocatedSensor(potentialSensor, 0, 0,0,0);
+
+                        VisualKinectUnit newSensor = new VisualKinectUnit(sensor, this.TestViewport.skeletonDrawingImage, this.TestViewport.colorImage);
+                        VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, this.TestViewport2.skeletonDrawingImage, this.TestViewport2.colorImage);
+                       // VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, skeletonImageList[0], colorImageList[0]);
+
+                        this.TestViewport.AttachVisualKinect(newSensor);
+                        /*
                         if ((numberOfKinects < colorImageList.Count) && (numberOfKinects < skeletonImageList.Count)) {
                             System.Windows.Controls.Image colorImage = colorImageList[numberOfKinects];
                             System.Windows.Controls.Image skeletonImage = skeletonImageList[numberOfKinects];
@@ -161,6 +169,7 @@ namespace KinectOSC
                         else {
                             visualKinectUnitList.Add(new VisualKinectUnit(sensor));
                         }
+                        */
                         numberOfKinects++;
                         Console.WriteLine("Number of Kinects : " + numberOfKinects);
                     }

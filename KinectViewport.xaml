@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="KinectOSC.KinectViewport"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="240" d:DesignWidth="320">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="17*"/>
+            <ColumnDefinition Width="56*"/>
+            <ColumnDefinition Width="38*"/>
+            <ColumnDefinition Width="auto" MinWidth="209"/>
+        </Grid.ColumnDefinitions>
+
+        <Image x:Name="colorImage"  Stretch="UniformToFill" Grid.ColumnSpan="4" Grid.RowSpan="4" />
+        <Image x:Name="skeletonDrawingImage" Stretch="UniformToFill" Panel.ZIndex="100" Grid.RowSpan="4" Grid.ColumnSpan="4" />
+        <Label Content="X" Panel.ZIndex="1000" HorizontalAlignment="Left" Margin="0,2,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="17"/>
+        <Label Content="Y" Panel.ZIndex="1000" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="26" Width="17"/>
+        <Label Content="Z" Panel.ZIndex="1000" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" Height="26" Width="17"/>
+        <Label Content="Pitch" Panel.ZIndex="1000" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Margin="0,2,0,0" Height="26" Width="36"/>
+        <Label Content="Yaw" Panel.ZIndex="1000" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="26" Width="31"/>
+        <Label Content="Roll" Panel.ZIndex="1000" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" Height="26" Width="30"/>
+        <TextBox x:Name="pitchAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,4,0,0" Grid.Row="1" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" TextChanged="changePitchAngle"/>
+        <TextBox x:Name="yawAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,3,0,0" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" TextChanged="changeYawAngle"/>
+        <TextBox x:Name="rollAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,2,0,0" Grid.Row="3" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" TextChanged="changeRollAngle"/>
+        <TextBox x:Name="xOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="2,4,0,0" Grid.Row="1" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Opacity="0.5" TextChanged="changeXOffset"/>
+        <TextBox x:Name="yOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Margin="2,2,0,0" Opacity="0.5" TextChanged="changeYOffset"/>
+        <TextBox x:Name="zOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="2,2,0,0" Grid.Row="3" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Opacity="0.5" TextChanged="changeZOffset"/>
+        <Rectangle HorizontalAlignment="Stretch" Grid.ColumnSpan="4" Fill="#FFF4F4F5"  Height="77" Grid.Row="1" Grid.RowSpan="3" VerticalAlignment="Top"  Opacity="0.3"/>
+
+    </Grid>
+</UserControl>

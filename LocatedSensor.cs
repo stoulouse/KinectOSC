@@ -7,7 +7,7 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace KinectOSC
 {
-    class LocatedSensor
+    public class LocatedSensor
     {
         public KinectSensor sensor { get; set; }
         public float xOffset { get; set; }

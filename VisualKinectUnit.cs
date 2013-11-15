@@ -14,7 +14,7 @@ namespace KinectOSC
     /// VisualKinectUnits hold a LocatedSensor kinect sensor class,
     ///  as well as an optional color bitmap and image to draw skeletons on
     /// </summary>
-    class VisualKinectUnit
+    public class VisualKinectUnit
     {
         public LocatedSensor locatedSensor { get; set; }
         private System.Windows.Controls.Image skeletonDrawingImage;
@@ -144,7 +144,8 @@ namespace KinectOSC
             using (DrawingContext dc = this.drawingGroup.Open()) {
                 bool noTrackedSkeletons = true;
                 // Draw a transparent background to set the render size
-                dc.DrawRectangle(Brushes.Transparent, null, new Rect(0.0, 0.0, this.skeletonDrawingImage.Width, this.skeletonDrawingImage.Height));
+                dc.DrawRectangle(Brushes.Transparent, null, new Rect(0.0, 0.0, this.colorImage.ActualWidth, this.colorImage.ActualHeight));
+                
                 if (this.locatedSensor.relativeSkeletons.Count > 0) {
                     //  foreach (Skeleton skel in this.locatedSensor.relativeSkeletons) {
                     foreach (Skeleton skel in this.locatedSensor.globalSkeletons) {
@@ -169,7 +170,8 @@ namespace KinectOSC
                     }
                 }
                 // prevent drawing outside of our render area
-                this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.skeletonDrawingImage.Width, this.skeletonDrawingImage.Height));
+                this.drawingGroup.ClipGeometry = new RectangleGeometry(new Rect(0.0, 0.0, this.colorImage.ActualWidth, this.colorImage.ActualHeight));
+                
             }
         }
         /// <summary>
@@ -182,25 +184,25 @@ namespace KinectOSC
                 drawingContext.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(0, this.skeletonDrawingImage.Height - ClipBoundsThickness, this.skeletonDrawingImage.Width, ClipBoundsThickness));
+                    new Rect(0, this.colorImage.ActualHeight - ClipBoundsThickness, this.colorImage.ActualWidth, ClipBoundsThickness));
             }
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Top)) {
                 drawingContext.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(0, 0, this.skeletonDrawingImage.Width, ClipBoundsThickness));
+                    new Rect(0, 0, this.colorImage.ActualWidth, ClipBoundsThickness));
             }
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Left)) {
                 drawingContext.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(0, 0, ClipBoundsThickness, this.skeletonDrawingImage.Height));
+                    new Rect(0, 0, ClipBoundsThickness, this.colorImage.ActualHeight));
             }
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Right)) {
                 drawingContext.DrawRectangle(
                     Brushes.Red,
                     null,
-                    new Rect(this.skeletonDrawingImage.Width - ClipBoundsThickness, 0, ClipBoundsThickness, this.skeletonDrawingImage.Height));
+                    new Rect(this.colorImage.ActualWidth - ClipBoundsThickness, 0, ClipBoundsThickness, this.colorImage.ActualHeight));
             }
         }
 
@@ -269,8 +271,8 @@ namespace KinectOSC
                                                                              skelpoint,
                                                                              DepthImageFormat.Resolution640x480Fps30);
             // Now adjust that point by the actual size of our drawing image
-            double imageWidthRatio = this.skeletonDrawingImage.Width / 640;
-            double imageHeightRatio = this.skeletonDrawingImage.Height / 480;
+            double imageWidthRatio = this.colorImage.ActualWidth / 640;
+            double imageHeightRatio = this.colorImage.ActualHeight / 480;
             return new Point(depthPoint.X * imageWidthRatio, depthPoint.Y * imageHeightRatio);
         }
 
