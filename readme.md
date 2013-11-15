@@ -1,3 +1,8 @@
+This utility allows you to read skeleton data from a number of Kinect sensors connected to your computer, and synthesize and output skeleton data from all sensors in a global coordinate frame. This means you can read skeleton data over a larger area and get relatively accurate positioning data through the whole space.
+
+It wraps the Kinect Sensor class into a LocatedSensor class, which applies position and rotation transformations to the skeleton data, which is further wrapped up in the VisualKinectUnit class, which allows for easy visualization when paired with the KinectViewport custom control, which provides a RGB stream and skeleton visualization overlay, as well as controls to adjust the offset parameters of the Kinect units you have set up.
+
+
 A simple utility that allows viewing Kinect video stream and skeletons. It also sends skeleton data as OSC.
 There are several options:
 1. You can send data as raw Kinect data or as percent of the width and height of viewing area 

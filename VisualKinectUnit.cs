@@ -112,6 +112,11 @@ namespace KinectOSC
             }
         }
 
+        public VisualKinectUnit(LocatedSensor sensor, KinectViewport viewport)
+        {
+            new VisualKinectUnit(sensor, viewport.skeletonDrawingImage, viewport.colorImage);
+        }
+
         public void Stop() {
             if (this.locatedSensor != null) {
                 locatedSensor.sensor.Stop();

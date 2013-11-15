@@ -146,7 +146,7 @@ namespace KinectOSC
                         LocatedSensor sensor = new LocatedSensor(potentialSensor, 0, 0,0,0);
 
                         VisualKinectUnit newSensor = new VisualKinectUnit(sensor, this.TestViewport.skeletonDrawingImage, this.TestViewport.colorImage);
-                        VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, this.TestViewport2.skeletonDrawingImage, this.TestViewport2.colorImage);
+                        VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, TestViewport2);
                        // VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, skeletonImageList[0], colorImageList[0]);
 
                         this.TestViewport.AttachVisualKinect(newSensor);
