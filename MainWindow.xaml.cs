@@ -143,7 +143,7 @@ namespace KinectOSC
                       //                                                            kinectYPositions[numberOfKinects],
                        //                                                           kinectZPositions[numberOfKinects],
                          //                                                         kinectAngles[numberOfKinects]);
-                        LocatedSensor sensor = new LocatedSensor(potentialSensor, 0, 0,0,0);
+                        LocatedSensor sensor = new LocatedSensor(potentialSensor, 0, 0,0,0, 0 , 0);
 
                         VisualKinectUnit newSensor = new VisualKinectUnit(sensor, this.TestViewport.skeletonDrawingImage, this.TestViewport.colorImage);
                         VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, TestViewport2);

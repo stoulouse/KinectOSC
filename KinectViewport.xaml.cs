@@ -71,17 +71,26 @@ namespace KinectOSC
 
         private void changePitchAngle(object sender, TextChangedEventArgs e)
         {
-
+            if (attachedKinectUnit != null)
+            {
+                attachedKinectUnit.locatedSensor.setPitch(sanitizeTextToFloat(this.pitchAngle.Text));
+            }
         }
 
         private void changeYawAngle(object sender, TextChangedEventArgs e)
         {
-
+            if (attachedKinectUnit != null)
+            {
+                attachedKinectUnit.locatedSensor.setYaw(sanitizeTextToFloat(this.yawAngle.Text));
+            }
         }
 
         private void changeRollAngle(object sender, TextChangedEventArgs e)
         {
-
+            if (attachedKinectUnit != null)
+            {
+                attachedKinectUnit.locatedSensor.setRoll(sanitizeTextToFloat(this.rollAngle.Text));
+            }
         }
     }
 }

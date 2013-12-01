@@ -14,6 +14,13 @@ namespace KinectOSC
         public float yOffset { get; set; }
         public float zOffset { get; set; }
         public DenseMatrix rotationMatrix { get; set; }
+        private double pitchAngle { get; set; }
+        private double yawAngle { get; set; }
+        private double rollAngle { get; set; }
+        private DenseMatrix rotationMatrixPitch { get; set; }
+        private DenseMatrix rotationMatrixYaw { get; set; }
+        private DenseMatrix rotationMatrixRoll { get; set; }
+        
         /// <summary>
         /// A List of skeletons, with joint positions in relative orientation to the sensor
         /// </summary>
@@ -36,7 +43,7 @@ namespace KinectOSC
         public LocatedSensor(KinectSensor sensor, float x, float y, float z,
             // Was going 
             //double rotationVectorX, double rotationVectorY, double rotationVectorZ,
-                              double theta) {
+                              double thetaPitch, double thetaYaw, double thetaRoll) {
             this.sensor = sensor;
             this.xOffset = x;
             this.yOffset = y;
@@ -68,24 +75,58 @@ namespace KinectOSC
                     rotationMatrix[3, 2] = 0;
                     rotationMatrix[3, 3] = 1;
               */
-
-            double thta = theta * Math.PI / 180; // Converted to radians
-            rotationMatrix = new DenseMatrix(3, 3);
-            rotationMatrix[0, 0] = Math.Cos(thta);
-            rotationMatrix[0, 1] = 0;
-            rotationMatrix[0, 2] = Math.Sin(thta);
-            rotationMatrix[1, 0] = 0;
-            rotationMatrix[1, 1] = 1;
-            rotationMatrix[1, 2] = 0;
-            rotationMatrix[2, 0] = -Math.Sin(thta);
-            rotationMatrix[2, 1] = 0;
-            rotationMatrix[2, 2] = Math.Cos(thta);
+            setRotationMatrix(thetaPitch, thetaRoll, thetaYaw);
 
             this.relativeSkeletons = new List<Skeleton>();
             this.globalSkeletons = new List<Skeleton>();
 
             //Register an event to update the internal skeleton lists when we get fresh skeleton data
             sensor.SkeletonFrameReady += this.refreshSkeletonPositions;
+        }
+
+        public void setPitch(double angle)
+        {
+            this.pitchAngle = angle;
+            setRotationMatrix(pitchAngle, rollAngle, yawAngle);
+        }
+        public void setRoll(double angle)
+        {
+            this.rollAngle = angle;
+            setRotationMatrix(pitchAngle, rollAngle, yawAngle);
+        }
+        public void setYaw(double angle)
+        {
+            this.yawAngle = angle;
+            setRotationMatrix(pitchAngle, rollAngle, yawAngle);
+        }
+
+
+        private void setRotationMatrix(double thetaPitch, double thetaRoll, double thetaYaw)
+        {
+
+            thetaPitch = thetaPitch * Math.PI / 180; // Converted to radians
+            thetaYaw = thetaYaw * Math.PI / 180;
+            thetaRoll = thetaRoll * Math.PI / 180;
+
+            //
+            rotationMatrixRoll = new DenseMatrix(3, 3);
+            rotationMatrixRoll[0, 0] = Math.Cos(thetaRoll);  rotationMatrixRoll[0, 1] = -Math.Sin(thetaRoll); rotationMatrixRoll[0, 2] = 0;
+            rotationMatrixRoll[1, 0] = Math.Sin(thetaRoll); rotationMatrixRoll[1, 1] = Math.Cos(thetaRoll); rotationMatrixRoll[1, 2] = 0;
+            rotationMatrixRoll[2, 0] = 0;                    rotationMatrixRoll[2, 1] = 0;                   rotationMatrixRoll[2, 2] = 1;
+
+            rotationMatrixYaw = new DenseMatrix(3, 3);
+            rotationMatrixYaw[0, 0] = Math.Cos(thetaYaw); rotationMatrixYaw[0, 1] = 0; rotationMatrixYaw[0, 2] = Math.Sin(thetaYaw);
+            rotationMatrixYaw[1, 0] = 0; rotationMatrixYaw[1, 1] = 1; rotationMatrixYaw[1, 2] = 0;
+            rotationMatrixYaw[2, 0] = -Math.Sin(thetaYaw); rotationMatrixYaw[2, 1] = 0; rotationMatrixYaw[2, 2] = Math.Cos(thetaYaw);
+
+            rotationMatrixPitch = new DenseMatrix(3, 3);
+            rotationMatrixPitch[0, 0] = 1;   rotationMatrixPitch[0, 1] = 0;                      rotationMatrixPitch[0, 2] = 0;
+            rotationMatrixPitch[1, 0] = 0;   rotationMatrixPitch[1, 1] = Math.Cos(thetaPitch);   rotationMatrixPitch[1, 2] = -Math.Sin(thetaPitch);
+            rotationMatrixPitch[2, 0] = 0;   rotationMatrixPitch[2, 1] = Math.Sin(thetaPitch);   rotationMatrixPitch[2, 2] = Math.Cos(thetaPitch);
+
+            rotationMatrix = rotationMatrixYaw;
+            rotationMatrix = (DenseMatrix)rotationMatrix.Multiply(rotationMatrixPitch);
+            rotationMatrix = (DenseMatrix)rotationMatrix.Multiply(rotationMatrixRoll);
         }
 
         /// <summary>
@@ -146,7 +187,7 @@ namespace KinectOSC
                         p[0, 0] = tempSkel.Position.X;
                         p[0, 1] = tempSkel.Position.Y;
                         p[0, 2] = tempSkel.Position.Z;
-                        var rPoint = p.Multiply(this.rotationMatrix);
+                        var rPoint = p.Multiply(this.rotationMatrixPitch);
 
                         // Then shift them by the global coordinates.
                         shiftedPosition.X = (float)rPoint[0, 0] + this.xOffset;
