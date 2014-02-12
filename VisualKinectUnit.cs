@@ -8,18 +8,22 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
+using System.Windows.Controls;
+
 namespace KinectOSC
 {
     /// <summary>
     /// VisualKinectUnits hold a LocatedSensor kinect sensor class,
     ///  as well as an optional color bitmap and image to draw skeletons on
     /// </summary>
-    public class VisualKinectUnit
+    public partial class VisualKinectUnit
     {
+        public bool showGlobalSkeletons { get; set; }
         public LocatedSensor locatedSensor { get; set; }
         private System.Windows.Controls.Image skeletonDrawingImage;
         private System.Windows.Controls.Image colorImage;
         private WriteableBitmap colorBitmap;
+        private KinectViewport viewport;
         /// <summary>
         /// Drawing group for skeleton rendering output
         /// </summary>
@@ -80,13 +84,16 @@ namespace KinectOSC
         /// <param name="sensor">LocatedSensor class kinect sensor</param>
         /// <param name="skeletonDrawingImage">Image that we'll draw the skeleton on</param>
         /// <param name="colorImage">Image we'll use to push the color camera video to</param>
-        public VisualKinectUnit(LocatedSensor locatedSensor, System.Windows.Controls.Image skeletonDrawingImage = null, System.Windows.Controls.Image colorImage = null) {
+        public VisualKinectUnit(LocatedSensor locatedSensor, System.Windows.Controls.Image skeletonDrawingImage = null,
+                                 System.Windows.Controls.Image colorImage = null, KinectViewport viewport = null) {
             // Get in some parameters
             this.locatedSensor = locatedSensor;
             this.skeletonDrawingImage = skeletonDrawingImage;
             this.colorImage = colorImage;
+            this.viewport = viewport;
 
             // Set up the basics for drawing a skeleton
+            this.showGlobalSkeletons = false;
             // Create the drawing group we'll use for drawing
             this.drawingGroup = new DrawingGroup();
             // Create an image source that we can use in our image control
@@ -110,11 +117,59 @@ namespace KinectOSC
                 locatedSensor.sensor.SkeletonFrameReady += this.refreshSkeletonDrawing;
                 this.skeletonDrawingImage.Source = imageSource;
             }
+
+            // If we've got a viewport, then let's attach the generic update value function to
+            //  the text changed handlers
+            if (viewport != null)
+            {
+                viewport.xOffset.TextChanged += updateValues;
+                viewport.yOffset.TextChanged += updateValues;
+                viewport.zOffset.TextChanged += updateValues;
+                viewport.pitchAngle.TextChanged += updateValues;
+                viewport.rollAngle.TextChanged += updateValues;
+                viewport.yawAngle.TextChanged += updateValues;
+                viewport.showGlobalSkeletons.Checked += setGlobalSkeletons;
+                viewport.showGlobalSkeletons.Unchecked += clearGlobalSkeletons;
+            }
+        }
+
+        private void updateValues(object sender, EventArgs e)
+        {
+            if (this.viewport != null){
+                this.locatedSensor.xOffset = sanitizeTextToFloat(this.viewport.xOffset.Text);
+                this.locatedSensor.yOffset = sanitizeTextToFloat(this.viewport.yOffset.Text);
+                this.locatedSensor.zOffset = sanitizeTextToFloat(this.viewport.zOffset.Text);
+                this.locatedSensor.setPitch(sanitizeTextToFloat(this.viewport.pitchAngle.Text));
+                this.locatedSensor.setYaw(sanitizeTextToFloat(this.viewport.yawAngle.Text));
+                this.locatedSensor.setRoll(sanitizeTextToFloat(this.viewport.rollAngle.Text));
+            }
+        }
+
+        //Ugh, if I understood data binding, this wouldn't be the ugly mess it is...
+        private void setGlobalSkeletons(object sender, EventArgs e)
+        {
+            Console.WriteLine("Checked box!");
+            this.showGlobalSkeletons = true;
+        }
+
+        private void clearGlobalSkeletons(object sender, EventArgs e)
+        {
+            this.showGlobalSkeletons = false;
+        }
+
+        private float sanitizeTextToFloat(string input)
+        {
+            float output = 0.0f;
+            if (!float.TryParse(input, out output))
+            {
+                output = 0.0f;
+            }
+            return output;
         }
 
         public VisualKinectUnit(LocatedSensor sensor, KinectViewport viewport)
         {
-            new VisualKinectUnit(sensor, viewport.skeletonDrawingImage, viewport.colorImage);
+            new VisualKinectUnit(sensor, viewport.skeletonDrawingImage, viewport.colorImage, viewport);
         }
 
         public void Stop() {
@@ -151,9 +206,15 @@ namespace KinectOSC
                 // Draw a transparent background to set the render size
                 dc.DrawRectangle(Brushes.Transparent, null, new Rect(0.0, 0.0, this.colorImage.ActualWidth, this.colorImage.ActualHeight));
                 
+                // If there are skeletons to draw, draw them, possibly adjusted for global positions
                 if (this.locatedSensor.relativeSkeletons.Count > 0) {
-                    //  foreach (Skeleton skel in this.locatedSensor.relativeSkeletons) {
-                    foreach (Skeleton skel in this.locatedSensor.globalSkeletons) {
+                    List<Skeleton> skeletonsToDraw;
+                    if (this.showGlobalSkeletons == true)
+                        skeletonsToDraw = this.locatedSensor.globalSkeletons;
+                    else
+                        skeletonsToDraw = this.locatedSensor.relativeSkeletons;
+                    
+                    foreach (Skeleton skel in skeletonsToDraw) {
                         RenderClippedEdges(skel, dc);
 
                         if (skel.TrackingState == SkeletonTrackingState.Tracked) {

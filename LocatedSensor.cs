@@ -136,6 +136,8 @@ namespace KinectOSC
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void refreshSkeletonPositions(object sender, SkeletonFrameReadyEventArgs e) {
+
+
             using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame()) {
                 if (skeletonFrame != null) {
                     // First, get the relative skeletons - easy peasy
@@ -152,7 +154,10 @@ namespace KinectOSC
                     foreach (Skeleton skel in this.relativeSkeletons) {
                         // Add a temporary skeleton object to store transformed
                         //  data into
-                        Skeleton tempSkel = skel;
+                        Skeleton tempSkel = new Skeleton();
+                        tempSkel.TrackingState = skel.TrackingState;
+                        tempSkel.TrackingId = skel.TrackingId;
+                        tempSkel.Position = skel.Position;
 
                         foreach (Joint j in skel.Joints) {
                             // Make a new joint, then put it into our temporary joint

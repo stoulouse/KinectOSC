@@ -20,8 +20,10 @@ namespace KinectOSC
     public partial class KinectViewport : UserControl
     {
         private VisualKinectUnit attachedKinectUnit;
+        public bool globalCheckbox;
 
-        public void AttachVisualKinect(VisualKinectUnit unit){
+        public void AttachVisualKinect(VisualKinectUnit unit)
+        {
             attachedKinectUnit = unit;
         }
 
@@ -44,7 +46,7 @@ namespace KinectOSC
             }
             return output;
         }
-
+        /*
         private void changeXOffset(object sender, TextChangedEventArgs e)
         {
             if (attachedKinectUnit != null)
@@ -92,5 +94,18 @@ namespace KinectOSC
                 attachedKinectUnit.locatedSensor.setRoll(sanitizeTextToFloat(this.rollAngle.Text));
             }
         }
+
+        private void setGlobalSkeletons(object sender, RoutedEventArgs e)
+        {
+            if (attachedKinectUnit != null)
+                attachedKinectUnit.showGlobalSkeletons = true;
+        }
+
+        private void clearGlobalSkeletons(object sender, RoutedEventArgs e)
+        {
+            if (attachedKinectUnit != null)
+                attachedKinectUnit.showGlobalSkeletons = false;
+        }
+         */
     }
 }

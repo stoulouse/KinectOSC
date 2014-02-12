@@ -43,7 +43,7 @@
   </dependency>
   <dependency>
     <dependentAssembly dependencyType="preRequisite" allowDelayedBinding="true">
-      <assemblyIdentity name="Microsoft.Kinect" version="1.7.0.0" publicKeyToken="31BF3856AD364E35" language="neutral" processorArchitecture="msil" />
+      <assemblyIdentity name="Microsoft.Kinect" version="1.8.0.0" publicKeyToken="31BF3856AD364E35" language="neutral" processorArchitecture="msil" />
     </dependentAssembly>
   </dependency>
   <dependency>
@@ -71,14 +71,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="KinectOSC.exe" size="134144">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="KinectOSC.exe" size="136704">
       <assemblyIdentity name="KinectOSC" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>0WSkVdaspBY3vl7kVw5mgoniwaA=</dsig:DigestValue>
+        <dsig:DigestValue>+VU/HsY9KNi5Kn+yX68yX80ElDQ=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

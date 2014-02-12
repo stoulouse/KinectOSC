@@ -27,13 +27,14 @@
         <Label Content="Pitch" Panel.ZIndex="1000" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Margin="0,2,0,0" Height="26" Width="36"/>
         <Label Content="Yaw" Panel.ZIndex="1000" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="26" Width="31"/>
         <Label Content="Roll" Panel.ZIndex="1000" Grid.Column="2" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" Height="26" Width="30"/>
-        <TextBox x:Name="pitchAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,4,0,0" Grid.Row="1" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" TextChanged="changePitchAngle"/>
-        <TextBox x:Name="yawAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,3,0,0" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" TextChanged="changeYawAngle"/>
-        <TextBox x:Name="rollAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,2,0,0" Grid.Row="3" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" TextChanged="changeRollAngle"/>
-        <TextBox x:Name="xOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="2,4,0,0" Grid.Row="1" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Opacity="0.5" TextChanged="changeXOffset"/>
-        <TextBox x:Name="yOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Margin="2,2,0,0" Opacity="0.5" TextChanged="changeYOffset"/>
-        <TextBox x:Name="zOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="2,2,0,0" Grid.Row="3" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Opacity="0.5" TextChanged="changeZOffset"/>
+        <TextBox x:Name="pitchAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,4,0,0" Grid.Row="1" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" />
+        <TextBox x:Name="yawAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,3,0,0" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" />
+        <TextBox x:Name="rollAngle" Panel.ZIndex="1000" Grid.Column="3" HorizontalAlignment="Left" Height="23" Margin="4,2,0,0" Grid.Row="3" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="37" Opacity="0.5" />
+        <TextBox x:Name="xOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="2,4,0,0" Grid.Row="1" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Opacity="0.5" />
+        <TextBox x:Name="yOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Margin="2,2,0,0" Opacity="0.5" />
+        <TextBox x:Name="zOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="2,2,0,0" Grid.Row="3" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Opacity="0.5" />
         <Rectangle HorizontalAlignment="Stretch" Grid.ColumnSpan="4" Fill="#FFF4F4F5"  Height="77" Grid.Row="1" Grid.RowSpan="3" VerticalAlignment="Top"  Opacity="0.3"/>
+        <CheckBox x:Name="showGlobalSkeletons" IsChecked="{Binding Path=globalCheckbox}" Panel.ZIndex="1000" Content="Show Global Skeletons" Grid.Column="3" HorizontalAlignment="Left" Margin="46,6,0,0" Grid.Row="1" VerticalAlignment="Top" />
 
     </Grid>
 </UserControl>

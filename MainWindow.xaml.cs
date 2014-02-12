@@ -145,11 +145,17 @@ namespace KinectOSC
                          //                                                         kinectAngles[numberOfKinects]);
                         LocatedSensor sensor = new LocatedSensor(potentialSensor, 0, 0,0,0, 0 , 0);
 
-                        VisualKinectUnit newSensor = new VisualKinectUnit(sensor, this.TestViewport.skeletonDrawingImage, this.TestViewport.colorImage);
+                        VisualKinectUnit newSensor = new VisualKinectUnit(sensor, this.TestViewport.skeletonDrawingImage, this.TestViewport.colorImage, TestViewport);
                         VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, TestViewport2);
                        // VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, skeletonImageList[0], colorImageList[0]);
 
+                        // Associate our viewport with the kinect data streams
                         this.TestViewport.AttachVisualKinect(newSensor);
+                        // This function collates the skeletons from all the sensors and removes duplicates
+                        newSensor.locatedSensor.sensor.SkeletonFrameReady += updateSkeletons;
+                        // This function sends out skeleton data as OSC
+                        newSensor.locatedSensor.sensor.SkeletonFrameReady += sendOSCAsAnimataData;
+                        visualKinectUnitList.Add(newSensor);
                         /*
                         if ((numberOfKinects < colorImageList.Count) && (numberOfKinects < skeletonImageList.Count)) {
                             System.Windows.Controls.Image colorImage = colorImageList[numberOfKinects];
@@ -199,12 +205,16 @@ namespace KinectOSC
         private List<int> leadSkeletonIDs;
 
         private void updateSkeletons(object sender, SkeletonFrameReadyEventArgs e) {
+            Console.WriteLine(this.TestViewport.globalCheckbox);
+
             masterSkeletonList = new List<Skeleton>();
             List<int> currentSkeletonIDs = new List<int>();
             // From each of our kinect sensors...
             foreach (VisualKinectUnit kinect in this.visualKinectUnitList){
                 // Read all our skeleton data
-                foreach (Skeleton skel in kinect.locatedSensor.globalSkeletons){
+                //foreach (Skeleton skel in kinect.locatedSensor.globalSkeletons)
+                foreach (Skeleton skel in kinect.locatedSensor.globalSkeletons)
+                {
                     // And if the skeleton is being tracked...
                     if (skel.TrackingState == SkeletonTrackingState.Tracked) {
                         currentSkeletonIDs.Add(skel.TrackingId);
@@ -345,6 +355,7 @@ namespace KinectOSC
 
         // Send out one skeleton data via OSC in Animata-friendly format
         private void sendOneOSCAnimataSkeleton(Skeleton skel, int counter){
+            Console.WriteLine("Sending one Animata Skeleton");
             double playerHeight = skeletonHeight(skel);
             // joints bundled individually as 2 floats (x, y)
             string oscText = "";
