@@ -72,7 +72,6 @@
         </DockPanel>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="5" Width="1200" HorizontalAlignment="Left" Background="AntiqueWhite" Margin="0,23,0,10" Grid.RowSpan="2">
             <Image x:Name="ColorImage0" Width="320" Height="240" Margin="-880,0,0,0" />
-            <local:KinectViewport x:Name="TestViewport2" Height="198" Margin="880,0,0,0"/>
             <Image x:Name="Image3" Width="320" Height="240" Margin="880,-240,0,0" Panel.ZIndex="100" />
             <Image x:Name="Image0" Width ="320" Height="240" Margin="0,-240,880,0" Panel.ZIndex="100" />
             <Image x:Name="ColorImage1" Width="320" Height="240" Margin="-240, -240,0,0" />
@@ -85,10 +84,6 @@
 				x:Name="oscViewer" VerticalAlignment="Top" Width="355" Panel.ZIndex="200" />
             <Button Visibility="Collapsed" x:Name="CloseOscViewer" Content="Close" Click="CloseOscViewerClicked" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0 -480 20 0" Width="100" Height="30" 
 				FontSize="16" Panel.ZIndex="300"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="10,0,0,0" TextWrapping="Wrap" Text="X" Width="72"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="10,0,0,0" TextWrapping="Wrap" Text="TextBox" Width="72"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="10,0,0,0" TextWrapping="Wrap" Text="TextBox" Width="72"/>
-            <TextBox HorizontalAlignment="Left" Height="30" Margin="10,0,0,0" TextWrapping="Wrap" Text="TextBox" Width="72"/>
         </StackPanel>
 
         <StatusBar Grid.Row="5" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" x:Name="statusBar" VerticalAlignment="Bottom" Background="White" Foreground="{StaticResource MediumGreyBrush}" Height="26">
@@ -232,6 +227,6 @@
             <TextBox x:Name="YOffsetTextBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="151,74,0,-1" Width="60" Height="25" FontSize="16" Text="1.0" 
 				VerticalContentAlignment="Center" Grid.Column="1"/>
         </Grid>
-        <local:KinectViewport x:Name="TestViewport" HorizontalAlignment="Left" Margin="241,104,0,0" Grid.Row="1" VerticalAlignment="Top" Height="362" Grid.RowSpan="2" Grid.ColumnSpan="3" Width="396"/>
+        <local:KinectViewport x:Name="TestViewport" HorizontalAlignment="Left" Margin="0,23,0,0" Grid.Row="1" VerticalAlignment="Top" Height="278" Width="341"/>
     </Grid>
 </Window>

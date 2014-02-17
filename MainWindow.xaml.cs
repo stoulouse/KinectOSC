@@ -146,36 +146,14 @@ namespace KinectOSC
                         LocatedSensor sensor = new LocatedSensor(potentialSensor, 0, 0,0,0, 0 , 0);
 
                         VisualKinectUnit newSensor = new VisualKinectUnit(sensor, this.TestViewport.skeletonDrawingImage, this.TestViewport.colorImage, TestViewport);
-                        VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, TestViewport2);
-                       // VisualKinectUnit newSensor2 = new VisualKinectUnit(sensor, skeletonImageList[0], colorImageList[0]);
-
-                        // Associate our viewport with the kinect data streams
-                        this.TestViewport.AttachVisualKinect(newSensor);
+             
                         // This function collates the skeletons from all the sensors and removes duplicates
                         newSensor.locatedSensor.sensor.SkeletonFrameReady += updateSkeletons;
                         // This function sends out skeleton data as OSC
                         newSensor.locatedSensor.sensor.SkeletonFrameReady += sendOSCAsAnimataData;
+                       
                         visualKinectUnitList.Add(newSensor);
-                        /*
-                        if ((numberOfKinects < colorImageList.Count) && (numberOfKinects < skeletonImageList.Count)) {
-                            System.Windows.Controls.Image colorImage = colorImageList[numberOfKinects];
-                            System.Windows.Controls.Image skeletonImage = skeletonImageList[numberOfKinects];
-                            VisualKinectUnit newSensor = new VisualKinectUnit(sensor, skeletonImage, colorImage);
-                            // Add a callback to our updateSkeletons function, so every frameReady event,
-                            //  we update our global list of skeletons
-                            newSensor.locatedSensor.sensor.SkeletonFrameReady += updateSkeletons;
-
-                            //newSensor.locatedSensor.sensor.SkeletonFrameReady += sendOSCHeadOnly;
-                            //newSensor.locatedSensor.sensor.SkeletonFrameReady += sendOSCHands;
-                            //newSensor.locatedSensor.sensor.SkeletonFrameReady += sendOSCForearms;
-                            newSensor.locatedSensor.sensor.SkeletonFrameReady += sendOSCAsAnimataData;
-
-                            visualKinectUnitList.Add(newSensor);
-                        }
-                        else {
-                            visualKinectUnitList.Add(new VisualKinectUnit(sensor));
-                        }
-                        */
+                       
                         numberOfKinects++;
                         Console.WriteLine("Number of Kinects : " + numberOfKinects);
                     }
