@@ -122,6 +122,7 @@ namespace KinectOSC
             //  the text changed handlers
             if (viewport != null)
             {
+                viewport.AttachVisualKinect(this);
                 viewport.xOffset.TextChanged += updateValues;
                 viewport.yOffset.TextChanged += updateValues;
                 viewport.zOffset.TextChanged += updateValues;
@@ -148,7 +149,6 @@ namespace KinectOSC
         //Ugh, if I understood data binding, this wouldn't be the ugly mess it is...
         private void setGlobalSkeletons(object sender, EventArgs e)
         {
-            Console.WriteLine("Checked box!");
             this.showGlobalSkeletons = true;
         }
 
