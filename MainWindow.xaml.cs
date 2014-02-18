@@ -53,11 +53,6 @@ namespace KinectOSC
         private bool showOscData = false;
 
         /// <summary>
-        /// If this is true the skeleton will be drawn on screen
-        /// </summary>
-        private bool showSkeleton = false;
-
-        /// <summary>
         /// Flag to choose to send data specifically in a format that Animata will appreciate
         /// </summary>
         private bool sendAnimataData = true;
@@ -67,13 +62,9 @@ namespace KinectOSC
         /// </summary>
         private string oscAddress = "";
 
-        /// <summary>
-        /// Active Kinect sensor
-        /// </summary>
         private List<VisualKinectUnit> visualKinectUnitList;
 
-        private List<System.Windows.Controls.Image> skeletonImageList;
-        private List<System.Windows.Controls.Image> colorImageList;
+        private VisualKinectGroup kinectGroup;
 
         // OSC 
         private static UdpWriter oscWriter;
@@ -107,24 +98,7 @@ namespace KinectOSC
             // Initialize Data viewer
             oscViewer.Text = "\nData will be shown here\nwhen there is a skeleton\nbeing tracked.";  
 
-            // Set up our lists
-            visualKinectUnitList = new List<VisualKinectUnit>();
-
-            skeletonImageList = new List<System.Windows.Controls.Image>();
-            skeletonImageList.Add(Image0);
-            skeletonImageList.Add(Image1);
-            skeletonImageList.Add(Image2);
-            skeletonImageList.Add(Image3);
-
-            colorImageList = new List<System.Windows.Controls.Image>();
-            colorImageList.Add(ColorImage0);
-            colorImageList.Add(ColorImage1);
-            colorImageList.Add(ColorImage2);
-            colorImageList.Add(ColorImage3);
-
-            masterSkeletonList = new List<Skeleton>();
-            leadSkeletonIDs = new List<int>();
-            prunedSkeletonList = new List<Skeleton>();
+            kinectGroup = new VisualKinectGroup();
 
             // Look through all sensors and start the first connected one.
             // This requires that a Kinect is connected at the time of app startup.
@@ -146,13 +120,11 @@ namespace KinectOSC
                         LocatedSensor sensor = new LocatedSensor(potentialSensor, 0, 0,0,0, 0 , 0);
 
                         VisualKinectUnit newSensor = new VisualKinectUnit(sensor, this.TestViewport.skeletonDrawingImage, this.TestViewport.colorImage, TestViewport);
-             
-                        // This function collates the skeletons from all the sensors and removes duplicates
-                        newSensor.locatedSensor.sensor.SkeletonFrameReady += updateSkeletons;
+                        kinectGroup.AddVisualKinectUnit(newSensor);
+
                         // This function sends out skeleton data as OSC
                         newSensor.locatedSensor.sensor.SkeletonFrameReady += sendOSCAsAnimataData;
                        
-                        visualKinectUnitList.Add(newSensor);
                        
                         numberOfKinects++;
                         Console.WriteLine("Number of Kinects : " + numberOfKinects);
@@ -164,121 +136,6 @@ namespace KinectOSC
             }
         }
 
-     
-        /// <summary>
-        /// This list holds all the skeletons seen by all sensors,
-        ///  with position data in the global coordinate frame
-        /// We trust that there won't be a conflict between random
-        ///  IDs assigned by kinect sensors
-        /// </summary>
-        private List<Skeleton> masterSkeletonList;
-        /// <summary>
-        /// Skeletons within this radius of each other will be assumed
-        ///  to be the same skeleton
-        /// </summary>
-        private float sameSkeletonRadius = 1.0f;
-
-        List<Skeleton> prunedSkeletonList;
-
-        private List<int> leadSkeletonIDs;
-
-        private void updateSkeletons(object sender, SkeletonFrameReadyEventArgs e) {
-            Console.WriteLine(this.TestViewport.globalCheckbox);
-
-            masterSkeletonList = new List<Skeleton>();
-            List<int> currentSkeletonIDs = new List<int>();
-            // From each of our kinect sensors...
-            foreach (VisualKinectUnit kinect in this.visualKinectUnitList){
-                // Read all our skeleton data
-                //foreach (Skeleton skel in kinect.locatedSensor.globalSkeletons)
-                foreach (Skeleton skel in kinect.locatedSensor.globalSkeletons)
-                {
-                    // And if the skeleton is being tracked...
-                    if (skel.TrackingState == SkeletonTrackingState.Tracked) {
-                        currentSkeletonIDs.Add(skel.TrackingId);
-                        bool isInMasterList = false;
-                        // if it's in our master list already, 
-                        for( int i = 0; i < masterSkeletonList.Count; i++) {
-                            // update the skeleton to the fresh data
-                            if (skel.TrackingId == masterSkeletonList[i].TrackingId) {
-                                masterSkeletonList[i] = skel;
-                                isInMasterList = true;
-                                break;
-                            }
-                        }
-                        if (!isInMasterList) {
-                            masterSkeletonList.Add(skel);
-                        }
-                    }
-                }
-            }
-//            Console.WriteLine("Size of master list: " + masterSkeletonList.Count);
-            // Now, make sure we remove extra IDs of skeletons that aren't in our view anymore
-            for (int i = leadSkeletonIDs.Count - 1; i >= 0; i--) {
-                if (currentSkeletonIDs.Find(item => item == leadSkeletonIDs[i]) == 0) {
-                    leadSkeletonIDs.RemoveAt(i);
-                }
-            }
-
-            // Now let's pick a skeleton to persistently follow if we're not following one
-            if (leadSkeletonIDs.Count == 0 && currentSkeletonIDs.Count > 0) {
-                leadSkeletonIDs.Add(currentSkeletonIDs[0]);
-            }
-
-            // And let's find duplicate skeletons that are our lead skeletons
-            if (leadSkeletonIDs.Count > 0) {
-                Skeleton trackedSkeleton = new Skeleton();
-                // Find our tracked skeleton
-                foreach (Skeleton skel in masterSkeletonList) {
-                    if ((skel.TrackingState == SkeletonTrackingState.Tracked ) && (currentSkeletonIDs.Find(id => id == skel.TrackingId) != 0) ){
-                        trackedSkeleton = skel;
-                        break;
-                    }
-                }
-                // Iterate through it agian, since we might have missed it the first time
-                foreach (Skeleton skel in masterSkeletonList) {
-                    if ((skel.TrackingState == SkeletonTrackingState.Tracked) && 
-                        skel.Position.X < trackedSkeleton.Position.X + sameSkeletonRadius &&
-                        skel.Position.X > trackedSkeleton.Position.X - sameSkeletonRadius &&
-                        skel.Position.Z < trackedSkeleton.Position.Z + sameSkeletonRadius &&
-                        skel.Position.Z > trackedSkeleton.Position.Z - sameSkeletonRadius &&
-                        skel != trackedSkeleton)
-                    {
-                        if (leadSkeletonIDs.Find(item => item == skel.TrackingId) == 0)
-                            leadSkeletonIDs.Add(skel.TrackingId);
-                    }
-                }
-            }
-
-            // Now let's prune our skeleton list to remove the duplicates
-            prunedSkeletonList = new List<Skeleton>();
-
-            foreach (Skeleton skel in masterSkeletonList) {
-                if (skel.TrackingState != SkeletonTrackingState.NotTracked) {
-                    Boolean isUnique = true;
-                    for (int i = 0; i < prunedSkeletonList.Count; i++) {
-                        if (isTheSameSkeleton(skel, prunedSkeletonList[i])) {
-                            isUnique = false;
-                        }
-                    }
-                    if (isUnique) {
-                        prunedSkeletonList.Add(skel);
-                    }
-                }
-            }
-        }
-
-        Boolean isTheSameSkeleton(Skeleton a, Skeleton b) {
-            if ((a.TrackingState == SkeletonTrackingState.Tracked) &&
-                        a.Position.X < b.Position.X + sameSkeletonRadius &&
-                        a.Position.X > b.Position.X - sameSkeletonRadius &&
-                        a.Position.Z < b.Position.Z + sameSkeletonRadius &&
-                        a.Position.Z > b.Position.Z - sameSkeletonRadius) {
-                return true;
-            }
-            else
-                return false;
-        }
 
         /// <summary>
         /// Execute shutdown tasks
@@ -287,7 +144,7 @@ namespace KinectOSC
         /// <param name="e">event arguments</param>
         private void WindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            foreach (VisualKinectUnit unit in visualKinectUnitList){
+            foreach (VisualKinectUnit unit in kinectGroup.visualKinectUnits){
                 unit.Stop();
             }
         }
@@ -310,15 +167,17 @@ namespace KinectOSC
 
         // This function will send out an entire skeleton data
         private void sendOSCAsAnimataData(object sender, SkeletonFrameReadyEventArgs e) {
-            if (prunedSkeletonList.Count == 0)
-                return;
-            int i = 0;
-            foreach (Skeleton skel in prunedSkeletonList) {
-
-              //  sendOneOSCHand(skel.Joints[JointType.HandLeft],i);
-              //  i++;
-                sendOneOSCAnimataSkeleton(skel, i);
-                i++;
+            if (kinectGroup != null)
+            {
+                List<Skeleton> skeletons = kinectGroup.getGlobalSkeletons();
+                if (skeletons.Count == 0)
+                    return;
+                int i = 0;
+                foreach (Skeleton skel in skeletons)
+                {
+                    sendOneOSCAnimataSkeleton(skel, i);
+                    i++;
+                }
             }
         }
 
@@ -333,7 +192,6 @@ namespace KinectOSC
 
         // Send out one skeleton data via OSC in Animata-friendly format
         private void sendOneOSCAnimataSkeleton(Skeleton skel, int counter){
-            Console.WriteLine("Sending one Animata Skeleton");
             double playerHeight = skeletonHeight(skel);
             // joints bundled individually as 2 floats (x, y)
             string oscText = "";
@@ -380,7 +238,7 @@ namespace KinectOSC
             return output;
         }
 
-        private void sendOSCHeadOnly(object sender, SkeletonFrameReadyEventArgs e)
+/*        private void sendOSCHeadOnly(object sender, SkeletonFrameReadyEventArgs e)
         {
             // If there isn't a skeleton we want to send, we don't send anything
             if (leadSkeletonIDs.Count == 0)
@@ -453,7 +311,7 @@ namespace KinectOSC
                 i++;
             }
         }
-
+        */
         private void sendOneOSCHand(Joint joint, int i) {
             var jointElement = new List<OscElement>();
             var jointX = joint.Position.X;
@@ -473,7 +331,7 @@ namespace KinectOSC
                 oscViewer.Text = oscText;
             }
         }
-
+        /*
         private void sendOSCForearms(object sender, SkeletonFrameReadyEventArgs e) {
             // If there isn't a skeleton we want to send, we don't send anything
             if (prunedSkeletonList.Count == 0)
@@ -487,7 +345,7 @@ namespace KinectOSC
                 i++;
             }
         }
-
+        */
         private void sendOneOSCForearm(Joint startJoint, Joint endJoint, int i) {
             var jointElement = new List<OscElement>();
            jointElement.Add(new OscElement(

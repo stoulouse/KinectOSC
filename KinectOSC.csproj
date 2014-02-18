@@ -108,6 +108,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="VisualKinectGroup.cs" />
     <Compile Include="KinectViewport.xaml.cs">
       <DependentUpon>KinectViewport.xaml</DependentUpon>
     </Compile>
