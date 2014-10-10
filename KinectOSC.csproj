@@ -65,7 +65,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bespoke.Common, Version=4.3.0.0, Culture=neutral, PublicKeyToken=843a094264521388, processorArchitecture=x86" />

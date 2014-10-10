@@ -19,8 +19,26 @@
             <ColumnDefinition Width="auto" MinWidth="209"/>
         </Grid.ColumnDefinitions>
 
-        <Image x:Name="colorImage"  Stretch="UniformToFill" Grid.ColumnSpan="4" Grid.RowSpan="4" />
-        <Image x:Name="skeletonDrawingImage" Stretch="UniformToFill" Panel.ZIndex="100" Grid.RowSpan="4" Grid.ColumnSpan="4" />
+        <Image x:Name="colorImage" Grid.ColumnSpan="4" Grid.RowSpan="4" RenderTransformOrigin="0.5,0.5"  >
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="1" ScaleX="-1"/>
+                    <SkewTransform AngleY="0" AngleX="0"/>
+                    <RotateTransform Angle="0"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+        <Image x:Name="skeletonDrawingImage" Panel.ZIndex="100" Grid.RowSpan="4" Grid.ColumnSpan="4" RenderTransformOrigin="0.5,0.5" >
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform ScaleY="1" ScaleX="-1"/>
+                    <SkewTransform AngleY="0" AngleX="0"/>
+                    <RotateTransform Angle="0"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
         <Label Content="X" Panel.ZIndex="1000" HorizontalAlignment="Left" Margin="0,2,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="17"/>
         <Label Content="Y" Panel.ZIndex="1000" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Top" Height="26" Width="17"/>
         <Label Content="Z" Panel.ZIndex="1000" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Top" Height="26" Width="17"/>
@@ -35,6 +53,8 @@
         <TextBox x:Name="zOffset" Panel.ZIndex="1000" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="2,2,0,0" Grid.Row="3" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="46" Opacity="0.5" />
         <Rectangle HorizontalAlignment="Stretch" Grid.ColumnSpan="4" Fill="#FFF4F4F5"  Height="77" Grid.Row="1" Grid.RowSpan="3" VerticalAlignment="Top"  Opacity="0.3"/>
         <CheckBox x:Name="showGlobalSkeletons" IsChecked="{Binding Path=globalCheckbox}" Panel.ZIndex="1000" Content="Show Global Skeletons" Grid.Column="3" HorizontalAlignment="Left" Margin="46,6,0,0" Grid.Row="1" VerticalAlignment="Top" />
-
+        <Label Name="kinectName" Content="Kinect Name" Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="auto"/>
+        <CheckBox x:Name="showDepth" IsChecked="{Binding showDepthCheckbox}" Panel.ZIndex="1000" Content="Show Depth" Grid.Column="3" HorizontalAlignment="Left" Margin="46,5,0,0" Grid.Row="2" VerticalAlignment="Top" Click="showDepth_Checked" />
+        <CheckBox x:Name="showTrackedSkeletons" IsChecked="{Binding Path=trackedCheckbox}" Panel.ZIndex="1000" Content="Show Tracked Skeletons" Grid.Column="3" HorizontalAlignment="Left" Margin="46,6,0,0" Grid.Row="3" VerticalAlignment="Top" />
     </Grid>
 </UserControl>

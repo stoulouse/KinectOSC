@@ -22,7 +22,7 @@ namespace KinectOSC
         /// We trust that there won't be a conflict between random
         ///  IDs assigned by kinect sensors
         /// </summary>
-        private List<Skeleton> masterSkeletonList;
+        public List<Skeleton> masterSkeletonList;
         /// <summary>
         /// Skeletons within this radius of each other will be assumed
         ///  to be the same skeleton
@@ -56,9 +56,156 @@ namespace KinectOSC
             return prunedSkeletonList;
         }
 
+
+        Dictionary<String, List<Skeleton>> allSkeletons = new Dictionary<String, List<Skeleton>>();
+        Dictionary<int, int> associatedSkeletons = new Dictionary<int, int>();
+
+        List<Skeleton> trackedSkeletons = new List<Skeleton>();
+
+        private String findSkeletonKinect(Skeleton skel)
+        {
+            String result = null;
+            foreach (KeyValuePair<String, List<Skeleton>> skels in allSkeletons)
+            {
+                if (skels.Value.Contains(skel))
+                {
+                    result = skels.Key;
+                    break;
+                }
+            }
+            return result;
+        }
+
         private void updateSkeletons(object sender, SkeletonFrameReadyEventArgs e)
         {
-            Console.WriteLine("x");
+            List<Skeleton> currentFrameSkeletons = new List<Skeleton>();
+
+            allSkeletons.Clear();
+            List<Skeleton> lastTrackedSkeletons = new List<Skeleton>( trackedSkeletons);
+            trackedSkeletons.Clear();
+
+            foreach (VisualKinectUnit kinect in this.visualKinectUnits)
+            {
+                foreach (Skeleton skel in kinect.locatedSensor.globalSkeletons)
+                {
+                    if (skel.TrackingState == SkeletonTrackingState.Tracked)
+                    {
+                        if (allSkeletons.ContainsKey(kinect.locatedSensor.sensor.UniqueKinectId) == false)
+                        {
+                            allSkeletons.Add(kinect.locatedSensor.sensor.UniqueKinectId, new List<Skeleton>());
+                        }
+                        allSkeletons[kinect.locatedSensor.sensor.UniqueKinectId].Add(skel);
+                        currentFrameSkeletons.Add(skel);
+                    }
+                }
+            }
+
+            List<int> toRemove = new List<int>();
+            foreach (KeyValuePair<int, int> a in associatedSkeletons) 
+            {
+                //currentFrameSkeletons.Exists()
+            }
+            
+
+            foreach (KeyValuePair<String, List<Skeleton>> skels in allSkeletons)
+            {
+                foreach (Skeleton skel in skels.Value)
+                {
+                    bool presentLastFrame = lastTrackedSkeletons.Exists(x => x.TrackingId == skel.TrackingId);
+                    if (!presentLastFrame && associatedSkeletons.ContainsKey(skel.TrackingId) == false && associatedSkeletons.ContainsValue(skel.TrackingId) == false)
+                    {
+                        String kinectId = findSkeletonKinect(skel);
+                        Console.WriteLine("new skeleton named " + skel.TrackingId.ToString());
+                        foreach (Skeleton s in currentFrameSkeletons)
+                        {
+                            String sKinectId = findSkeletonKinect(s);
+                            if (sKinectId.Equals(kinectId) == false)
+                            {
+                                if (isTheSameSkeleton(skel, s))
+                                {
+                                    Console.WriteLine("similar to " + s.TrackingId.ToString());
+                                    associatedSkeletons.Add(skel.TrackingId, s.TrackingId);
+                                    break;
+                                }
+                            }
+                        }
+
+                        Console.WriteLine("tracking " + skel.TrackingId.ToString());
+                        trackedSkeletons.Add(skel);
+                    }
+                }
+            }
+
+            foreach (KeyValuePair<String, List<Skeleton>> skels in allSkeletons)
+            {
+                foreach (Skeleton skel in skels.Value)
+                {
+                    bool presentLastFrame = lastTrackedSkeletons.Exists(x => x.TrackingId == skel.TrackingId);
+                    if (presentLastFrame)
+                    {
+                        if (associatedSkeletons.ContainsValue(skel.TrackingId) == false)
+                        {
+                            //Console.WriteLine("tracking " + skel.TrackingId.ToString());
+                            trackedSkeletons.Add(skel);
+                        }
+                    }
+                }
+            }
+
+            
+            foreach (KeyValuePair<String, List<Skeleton>> skels in allSkeletons)
+            {
+                foreach (Skeleton skel in skels.Value)
+                {
+
+                    if (trackedSkeletons.Exists(x => x.TrackingId == skel.TrackingId) == false)
+                    {
+                        if (associatedSkeletons.ContainsValue(skel.TrackingId) == true)
+                        {
+                            try
+                            {
+                                KeyValuePair<int, int> i = associatedSkeletons.FirstOrDefault(x => x.Value == skel.TrackingId);
+                                if (trackedSkeletons.Exists(x => x.TrackingId == i.Key) == false)
+                                {
+                                    Console.WriteLine("tracking orphan " + skel.TrackingId.ToString());
+                                    trackedSkeletons.Add(skel);
+                                    associatedSkeletons.Remove(i.Key);
+                                    associatedSkeletons.Remove(skel.TrackingId);
+                                    associatedSkeletons.Add(skel.TrackingId, i.Key);
+                                }
+                            }
+                            catch (InvalidOperationException ex)
+                            {
+
+                            }
+                        }
+                    }
+                        
+                    
+                }
+            }
+            
+            prunedSkeletonList = new List<Skeleton>(trackedSkeletons);
+
+            foreach (VisualKinectUnit kinect in this.visualKinectUnits)
+            {
+                lock (kinect.locatedSensor.trackedSkeletonsLock)
+                {
+                    kinect.locatedSensor.trackedSkeletons.Clear();
+                    foreach (Skeleton skel in trackedSkeletons)
+                    {
+                        String k = findSkeletonKinect(skel);
+                        if (k.Equals(kinect.locatedSensor.sensor.UniqueKinectId))
+                        {
+                            kinect.locatedSensor.trackedSkeletons.Add(skel);
+                        }
+                    }
+                }
+            }
+
+            return;
+
+            Console.WriteLine("x:");
             masterSkeletonList = new List<Skeleton>();
             List<int> currentSkeletonIDs = new List<int>();
             // From each of our kinect sensors...
@@ -118,6 +265,7 @@ namespace KinectOSC
                         break;
                     }
                 }
+
                 // Iterate through it agian, since we might have missed it the first time
                 foreach (Skeleton skel in masterSkeletonList)
                 {
@@ -132,6 +280,7 @@ namespace KinectOSC
                             leadSkeletonIDs.Add(skel.TrackingId);
                     }
                 }
+
             }
 
             // Now let's prune our skeleton list to remove the duplicates
@@ -147,6 +296,7 @@ namespace KinectOSC
                         if (isTheSameSkeleton(skel, prunedSkeletonList[i]))
                         {
                             isUnique = false;
+                            
                         }
                     }
                     if (isUnique)
@@ -157,8 +307,31 @@ namespace KinectOSC
             }
         }
 
+        public double sameSkeletonAngle = 0.6;
         Boolean isTheSameSkeleton(Skeleton a, Skeleton b)
         {
+            if (a.TrackingState == SkeletonTrackingState.Tracked && b.TrackingState == SkeletonTrackingState.Tracked)
+            {
+                Vector4 aq = a.BoneOrientations[JointType.Spine].HierarchicalRotation.Quaternion;
+                Vector4 bq = b.BoneOrientations[JointType.Spine].HierarchicalRotation.Quaternion;
+                return
+                    aq.X < bq.X + sameSkeletonAngle &&
+                    aq.X > bq.X - sameSkeletonAngle &&
+
+                    aq.Y < bq.Y + sameSkeletonAngle &&
+                    aq.Y > bq.Y - sameSkeletonAngle &&
+
+                    aq.Z < bq.Z + sameSkeletonAngle &&
+                    aq.Z > bq.Z - sameSkeletonAngle &&
+
+                    aq.W < bq.W + sameSkeletonAngle &&
+                    aq.W > bq.W - sameSkeletonAngle;
+
+            }
+            return false;
+
+
+
             if ((a.TrackingState == SkeletonTrackingState.Tracked) &&
                         a.Position.X < b.Position.X + sameSkeletonRadius &&
                         a.Position.X > b.Position.X - sameSkeletonRadius &&

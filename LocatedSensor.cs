@@ -30,6 +30,9 @@ namespace KinectOSC
         /// </summary>
         public List<Skeleton> globalSkeletons;
 
+        public readonly object trackedSkeletonsLock = new object();
+        public List<Skeleton> trackedSkeletons;
+
         public LocatedSensor() { }
 
         /// <summary>
@@ -79,6 +82,7 @@ namespace KinectOSC
 
             this.relativeSkeletons = new List<Skeleton>();
             this.globalSkeletons = new List<Skeleton>();
+            this.trackedSkeletons = new List<Skeleton>();
 
             //Register an event to update the internal skeleton lists when we get fresh skeleton data
             sensor.SkeletonFrameReady += this.refreshSkeletonPositions;
@@ -151,58 +155,63 @@ namespace KinectOSC
                     this.globalSkeletons.Clear();
                     // Next, iterate through all the skeletons, applying a rotation and translation
                     //  to get us into global coordinates
-                    foreach (Skeleton skel in this.relativeSkeletons) {
-                        // Add a temporary skeleton object to store transformed
-                        //  data into
-                        Skeleton tempSkel = new Skeleton();
-                        tempSkel.TrackingState = skel.TrackingState;
-                        tempSkel.TrackingId = skel.TrackingId;
-                        tempSkel.Position = skel.Position;
+                    lock (trackedSkeletonsLock)
+                    {
+                        foreach (Skeleton skel in this.relativeSkeletons)
+                        {
+                            // Add a temporary skeleton object to store transformed
+                            //  data into
+                            Skeleton tempSkel = new Skeleton();
+                            tempSkel.TrackingState = skel.TrackingState;
+                            tempSkel.TrackingId = skel.TrackingId;
+                            tempSkel.Position = skel.Position;
 
-                        foreach (Joint j in skel.Joints) {
-                            // Make a new joint, then put it into our temporary joint
-                            //  collection
-                            JointType type = j.JointType;
-                            Joint tempJoint = tempSkel.Joints[type];
-                            // Copy the current joint state
-                            JointTrackingState tracking = j.TrackingState;
-                            tempJoint.TrackingState = tracking;
+                            foreach (Joint j in skel.Joints)
+                            {
+                                // Make a new joint, then put it into our temporary joint
+                                //  collection
+                                JointType type = j.JointType;
+                                Joint tempJoint = tempSkel.Joints[type];
+                                // Copy the current joint state
+                                JointTrackingState tracking = j.TrackingState;
+                                tempJoint.TrackingState = tracking;
 
-                            // However, we transform the position of the joint at least
-                            SkeletonPoint shiftedPoint = new SkeletonPoint();
-                            // Rotate the points
-                            DenseMatrix point = new DenseMatrix(1, 3);
-                            point[0, 0] = j.Position.X;
-                            point[0, 1] = j.Position.Y;
-                            point[0, 2] = j.Position.Z;
-                            var rotatedPoint = point.Multiply(this.rotationMatrix);
+                                // However, we transform the position of the joint at least
+                                SkeletonPoint shiftedPoint = new SkeletonPoint();
+                                // Rotate the points
+                                DenseMatrix point = new DenseMatrix(1, 3);
+                                point[0, 0] = j.Position.X;
+                                point[0, 1] = j.Position.Y;
+                                point[0, 2] = j.Position.Z;
+                                var rotatedPoint = point.Multiply(this.rotationMatrix);
+
+                                // Then shift them by the global coordinates.
+                                shiftedPoint.X = (float)rotatedPoint[0, 0] + this.xOffset;
+                                shiftedPoint.Y = (float)rotatedPoint[0, 1] + this.yOffset;
+                                shiftedPoint.Z = (float)rotatedPoint[0, 2] + this.zOffset;
+                                tempJoint.Position = shiftedPoint;
+
+                                tempSkel.Joints[type] = tempJoint;
+                            }
+                            // Next, alter the higher-level parameters of our skeleton
+                            SkeletonPoint shiftedPosition = new SkeletonPoint();
+                            // Rotate
+                            DenseMatrix p = new DenseMatrix(1, 3);
+                            p[0, 0] = tempSkel.Position.X;
+                            p[0, 1] = tempSkel.Position.Y;
+                            p[0, 2] = tempSkel.Position.Z;
+                            var rPoint = p.Multiply(this.rotationMatrixPitch);
 
                             // Then shift them by the global coordinates.
-                            shiftedPoint.X = (float)rotatedPoint[0, 0] + this.xOffset;
-                            shiftedPoint.Y = (float)rotatedPoint[0, 1] + this.yOffset;
-                            shiftedPoint.Z = (float)rotatedPoint[0, 2] + this.zOffset;
-                            tempJoint.Position = shiftedPoint;
+                            shiftedPosition.X = (float)rPoint[0, 0] + this.xOffset;
+                            shiftedPosition.Y = (float)rPoint[0, 1] + this.yOffset;
+                            shiftedPosition.Z = (float)rPoint[0, 2] + this.zOffset;
 
-                            tempSkel.Joints[type] = tempJoint;
+                            tempSkel.Position = shiftedPosition;
+
+                            // Now add that skeleton to our global skeleton list
+                            this.globalSkeletons.Add(tempSkel);
                         }
-                        // Next, alter the higher-level parameters of our skeleton
-                        SkeletonPoint shiftedPosition = new SkeletonPoint();
-                        // Rotate
-                        DenseMatrix p = new DenseMatrix(1, 3);
-                        p[0, 0] = tempSkel.Position.X;
-                        p[0, 1] = tempSkel.Position.Y;
-                        p[0, 2] = tempSkel.Position.Z;
-                        var rPoint = p.Multiply(this.rotationMatrixPitch);
-
-                        // Then shift them by the global coordinates.
-                        shiftedPosition.X = (float)rPoint[0, 0] + this.xOffset;
-                        shiftedPosition.Y = (float)rPoint[0, 1] + this.yOffset;
-                        shiftedPosition.Z = (float)rPoint[0, 2] + this.zOffset;
-
-                        tempSkel.Position = shiftedPosition;
-
-                        // Now add that skeleton to our global skeleton list
-                        this.globalSkeletons.Add(tempSkel);
                     }
                 }
             }

@@ -19,6 +19,7 @@ namespace KinectOSC
     public partial class VisualKinectUnit
     {
         public bool showGlobalSkeletons { get; set; }
+        public bool showTrackedSkeletons { get; set; }
         public LocatedSensor locatedSensor { get; set; }
         private System.Windows.Controls.Image skeletonDrawingImage;
         private System.Windows.Controls.Image colorImage;
@@ -94,6 +95,7 @@ namespace KinectOSC
 
             // Set up the basics for drawing a skeleton
             this.showGlobalSkeletons = false;
+            this.showTrackedSkeletons = true;
             // Create the drawing group we'll use for drawing
             this.drawingGroup = new DrawingGroup();
             // Create an image source that we can use in our image control
@@ -103,6 +105,10 @@ namespace KinectOSC
             // Turn on the color stream to receive color frames
             locatedSensor.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
 
+            locatedSensor.sensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+
+
+
             // This is the bitmap we'll display on-screen
             colorBitmap = (new WriteableBitmap(locatedSensor.sensor.ColorStream.FrameWidth,
                                                locatedSensor.sensor.ColorStream.FrameHeight,
@@ -111,6 +117,7 @@ namespace KinectOSC
             // Add an event handler to be called whenever there is new color frame data
             if (colorImage != null) {
                 locatedSensor.sensor.ColorFrameReady += this.refreshColorImage;
+                locatedSensor.sensor.DepthFrameReady += this.refreshDepthImage;
             }
             // Add an event handler to be called whenever there is new color frame data
             if (skeletonDrawingImage != null) {
@@ -131,6 +138,8 @@ namespace KinectOSC
                 viewport.yawAngle.TextChanged += updateValues;
                 viewport.showGlobalSkeletons.Checked += setGlobalSkeletons;
                 viewport.showGlobalSkeletons.Unchecked += clearGlobalSkeletons;
+                viewport.showTrackedSkeletons.Checked += setTrackedSkeletons;
+                viewport.showTrackedSkeletons.Unchecked += clearTrackedSkeletons;
             }
         }
 
@@ -155,6 +164,17 @@ namespace KinectOSC
         private void clearGlobalSkeletons(object sender, EventArgs e)
         {
             this.showGlobalSkeletons = false;
+        }
+
+        //Ugh, if I understood data binding, this wouldn't be the ugly mess it is...
+        private void setTrackedSkeletons(object sender, EventArgs e)
+        {
+            this.showTrackedSkeletons = true;
+        }
+
+        private void clearTrackedSkeletons(object sender, EventArgs e)
+        {
+            this.showTrackedSkeletons = false;
         }
 
         private float sanitizeTextToFloat(string input)
@@ -185,17 +205,84 @@ namespace KinectOSC
         /// <param name="e">event arguments</param>
         /// //Refactor this by having you pass in a bitmap to draw to
         private void refreshColorImage(object sender, ColorImageFrameReadyEventArgs e) {
-            using (ColorImageFrame colorFrame = e.OpenColorImageFrame()) {
-                if (colorFrame != null) {
-                    // Copy the pixel data from the image to a temporary array
-                    byte[] colorPixels = new byte[colorFrame.PixelDataLength];
-                    colorFrame.CopyPixelDataTo(colorPixels);
+            if (viewport != null && !viewport.showDepthCheckbox)
+            {
+                using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+                {
+                    if (colorFrame != null)
+                    {
+                        // Copy the pixel data from the image to a temporary array
+                        byte[] colorPixels = new byte[colorFrame.PixelDataLength];
+                        colorFrame.CopyPixelDataTo(colorPixels);
 
-                    // Write the pixel data into our bitmap
-                    Int32Rect sourceRect = new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight);
-                    this.colorBitmap.WritePixels(sourceRect, colorPixels, this.colorBitmap.PixelWidth * sizeof(int), 0);
+                        // Write the pixel data into our bitmap
+                        Int32Rect sourceRect = new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight);
+                        this.colorBitmap.WritePixels(sourceRect, colorPixels, this.colorBitmap.PixelWidth * sizeof(int), 0);
 
-                    this.colorImage.Source = colorBitmap;
+                        this.colorImage.Source = colorBitmap;
+                    }
+                }
+            }
+        }
+
+        private void refreshDepthImage(object sender, DepthImageFrameReadyEventArgs e)
+        {
+            if (viewport != null && viewport.showDepthCheckbox)
+            {
+                using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
+                {
+                    if (depthFrame != null)
+                    {
+                        // Copy the pixel data from the image to a temporary array
+                        DepthImagePixel[] depthPixels = new DepthImagePixel[depthFrame.PixelDataLength];
+                        depthFrame.CopyDepthImagePixelDataTo(depthPixels);
+
+                        byte[] colorPixels = new byte[depthFrame.PixelDataLength * sizeof(int)];
+
+                        // Get the min and max reliable depth for the current frame
+                        int minDepth = depthFrame.MinDepth;
+                        int maxDepth = depthFrame.MaxDepth;
+
+                        // Convert the depth to RGB
+                        int colorPixelIndex = 0;
+                        for (int i = 0; i < depthPixels.Length; ++i)
+                        {
+                            // Get the depth for this pixel
+                            short depth = depthPixels[i].Depth;
+
+                            // To convert to a byte, we're discarding the most-significant
+                            // rather than least-significant bits.
+                            // We're preserving detail, although the intensity will "wrap."
+                            // Values outside the reliable depth range are mapped to 0 (black).
+
+                            // Note: Using conditionals in this loop could degrade performance.
+                            // Consider using a lookup table instead when writing production code.
+                            // See the KinectDepthViewer class used by the KinectExplorer sample
+                            // for a lookup table example.
+                            byte intensity = (byte)(depth >= minDepth && depth <= maxDepth ? depth : 0);
+
+                            // Write out blue byte
+                            colorPixels[colorPixelIndex++] = intensity;
+
+                            // Write out green byte
+                            colorPixels[colorPixelIndex++] = intensity;
+
+                            // Write out red byte                        
+                            colorPixels[colorPixelIndex++] = intensity;
+
+                            // We're outputting BGR, the last byte in the 32 bits is unused so skip it
+                            // If we were outputting BGRA, we would write alpha here.
+                            ++colorPixelIndex;
+                        }
+
+
+
+                        // Write the pixel data into our bitmap
+                        Int32Rect sourceRect = new Int32Rect(0, 0, this.colorBitmap.PixelWidth, this.colorBitmap.PixelHeight);
+                        this.colorBitmap.WritePixels(sourceRect, colorPixels, this.colorBitmap.PixelWidth * sizeof(int), 0);
+
+                        this.colorImage.Source = colorBitmap;
+                    }
                 }
             }
         }
@@ -209,29 +296,65 @@ namespace KinectOSC
                 // If there are skeletons to draw, draw them, possibly adjusted for global positions
                 if (this.locatedSensor.relativeSkeletons.Count > 0) {
                     List<Skeleton> skeletonsToDraw;
-                    if (this.showGlobalSkeletons == true)
-                        skeletonsToDraw = this.locatedSensor.globalSkeletons;
-                    else
-                        skeletonsToDraw = this.locatedSensor.relativeSkeletons;
-                    
-                    foreach (Skeleton skel in skeletonsToDraw) {
-                        RenderClippedEdges(skel, dc);
 
-                        if (skel.TrackingState == SkeletonTrackingState.Tracked) {
-                            noTrackedSkeletons = false;
-                            this.DrawBonesAndJoints(skel, dc);
-                        }
-                        else if (skel.TrackingState == SkeletonTrackingState.PositionOnly) {
-                            dc.DrawEllipse(
-                           this.centerPointBrush,
-                           null,
-                           this.SkeletonPointToScreen(skel.Position),
-                           BodyCenterThickness,
-                           BodyCenterThickness);
-                        }
-                        else if (skel.TrackingState == SkeletonTrackingState.NotTracked) {
+                    if (!this.showTrackedSkeletons)
+                    {
+                        if (this.showGlobalSkeletons == true)
+                            skeletonsToDraw = this.locatedSensor.globalSkeletons;
+                        else
+                            skeletonsToDraw = this.locatedSensor.relativeSkeletons;
+
+                        foreach (Skeleton skel in skeletonsToDraw)
+                        {
+                            RenderClippedEdges(skel, dc);
+
+                            if (skel.TrackingState == SkeletonTrackingState.Tracked)
+                            {
+                                noTrackedSkeletons = false;
+                                this.DrawBonesAndJoints(skel, dc);
+                            }
+                            else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
+                            {
+                                dc.DrawEllipse(
+                               this.centerPointBrush,
+                               null,
+                               this.SkeletonPointToScreen(skel.Position),
+                               BodyCenterThickness,
+                               BodyCenterThickness);
+                            }
+                            else if (skel.TrackingState == SkeletonTrackingState.NotTracked)
+                            {
+                            }
                         }
                     }
+                    else
+                    {
+
+                        skeletonsToDraw = this.locatedSensor.trackedSkeletons;
+                        foreach (Skeleton skel in skeletonsToDraw)
+                        {
+                            RenderClippedEdges(skel, dc);
+
+                            if (skel.TrackingState == SkeletonTrackingState.Tracked)
+                            {
+                                noTrackedSkeletons = false;
+                                this.DrawBonesAndJoints(skel, dc);
+                            }
+                            else if (skel.TrackingState == SkeletonTrackingState.PositionOnly)
+                            {
+                                dc.DrawEllipse(
+                               this.centerPointBrush,
+                               null,
+                               this.SkeletonPointToScreen(skel.Position),
+                               BodyCenterThickness,
+                               BodyCenterThickness);
+                            }
+                            else if (skel.TrackingState == SkeletonTrackingState.NotTracked)
+                            {
+                            }
+                        }
+                    }
+
                     if (noTrackedSkeletons) {
                     }
                 }

@@ -21,20 +21,29 @@ namespace KinectOSC
     {
         private VisualKinectUnit attachedKinectUnit;
         public bool globalCheckbox;
+        public bool showDepthCheckbox;
+        public bool trackedCheckbox;
 
         public void AttachVisualKinect(VisualKinectUnit unit)
         {
             attachedKinectUnit = unit;
+            kinectName.Content = unit.locatedSensor.sensor.UniqueKinectId;
         }
 
         public void DetachVisualKinectUnit()
         {
             attachedKinectUnit = null;
+            kinectName.Content = "No Kinect";
         }
 
         public KinectViewport()
         {
             InitializeComponent();
+        }
+
+        private void showDepth_Checked(object sender, RoutedEventArgs e)
+        {
+            showDepthCheckbox = !showDepthCheckbox;
         }
     }
 }
